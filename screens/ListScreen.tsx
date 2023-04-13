@@ -1,7 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { StyleSheet, Text, View, ScrollView } from 'react-native'
-import { List, ListItem, Modal, Button, Card } from '@ui-kitten/components'
+import {
+  List,
+  ListItem,
+  Modal,
+  Button,
+  Card,
+  Icon,
+} from '@ui-kitten/components'
 import { useFocusEffect } from '@react-navigation/native'
+import HeadingMd from '../components/HeadingMd'
+import BodyMd from '../components/BodyMd'
 
 export default function ListScreen() {
   type TaskT = {
@@ -72,6 +81,11 @@ export default function ListScreen() {
     deleteTask(task)
   }
 
+  /**
+   * List Item
+   * @param props
+   * @returns jsx
+   */
   const renderItem = ({ item, index }) => (
     <ListItem
       onPress={() => onListPress(item)}
@@ -80,19 +94,53 @@ export default function ListScreen() {
     />
   )
 
+  /**
+   * Modal Footer
+   */
+
+  const Footer = () => (
+    <View style={styles.footerContainer}>
+      <Button
+        style={styles.footerControl}
+        onPress={() => deleteTaskPress()}
+        status="danger"
+        appearance="outline"
+        accessoryLeft={<Icon name="trash" />}
+      />
+      <Button
+        style={styles.footerControl}
+        onPress={() => closeModal()}
+        status="success"
+        appearance="outline"
+        accessoryLeft={<Icon name="checkmark" />}
+      />
+    </View>
+  )
+
   return (
     <View style={styles.container}>
+      {/* List of Tasks  */}
       {tasks && <List data={tasks} renderItem={renderItem} />}
+
+      {/* Edit / Delete model  */}
       <Modal
         visible={visible}
         backdropStyle={styles.backdrop}
         onBackdropPress={() => closeModal()}
+        style={styles.modal}
       >
-        <Card disabled={true}>
-          <Text>{task.title}</Text>
-          <Text>{task.description}</Text>
-          <Button onPress={() => deleteTaskPress()}>DELETE TASK</Button>
-          <Button onPress={() => closeModal()}>DISMISS</Button>
+        <Card footer={Footer} style={styles.card}>
+          <View style={styles.modal_close_wrapper}>
+            <Button
+              accessoryLeft={<Icon name="close" />}
+              style={styles.modal_close_button}
+              onPress={() => closeModal()}
+              appearance="ghost"
+              size="large"
+            />
+          </View>
+          <HeadingMd style={styles.modal_title}>{task.title}</HeadingMd>
+          <BodyMd>{task.description}</BodyMd>
         </Card>
       </Modal>
     </View>
@@ -105,5 +153,34 @@ const styles = StyleSheet.create({
   },
   backdrop: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modal: {
+    justifyContent: 'center',
+    width: '100%',
+  },
+  modal_title: {
+    marginBottom: 12,
+  },
+  modal_close_wrapper: {
+    justifyContent: 'flex-end',
+    flexDirection: 'row',
+    height: 20,
+  },
+  modal_close_button: {
+    position: 'absolute',
+    top: -12,
+    right: -20,
+  },
+  card: {
+    flexGrow: 1,
+    padding: 12,
+    margin: 12,
+  },
+  footerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  footerControl: {
+    marginHorizontal: 2,
   },
 })
