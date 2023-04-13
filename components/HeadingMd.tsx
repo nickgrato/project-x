@@ -12,7 +12,7 @@ export default HeadingMd
 
 const styles = StyleSheet.create({
   heading: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: '700',
   },
 })
