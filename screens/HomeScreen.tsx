@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   StyleSheet,
   View,
@@ -14,12 +14,31 @@ import Message from '../shared/Message'
 
 const PlusIcon = (props) => <Icon {...props} name="plus-outline" />
 
+type QuoteT = {
+  quote: string
+  author: string
+  category: string
+}
+
 export default function Home() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [isError, setIsError] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [isFailure, setIsFailure] = useState(false)
+  const [quote, setQuote] = useState<QuoteT | null>(null)
+
+  useEffect(() => {
+    async function getQuote() {
+      const blob = await fetch('https://serverx.fly.dev/api/quotes')
+      const { data } = await blob.json()
+      return data as QuoteT[]
+    }
+
+    getQuote().then((resp) => {
+      setQuote(resp[0])
+    })
+  }, [])
 
   const clearForm = () => {
     setTitle('')
@@ -106,13 +125,13 @@ export default function Home() {
 
           {/* HOME SCREEN CONTENTS  */}
           <ScrollView style={styles.body}>
-            <Card style={styles.mb_10}>
-              <Text style={[styles.h3, styles.mb_10]}>Quote of the day</Text>
-              <Text>
-                “In order to write about life first you must live it.”– Ernest
-                Hemingway
-              </Text>
-            </Card>
+            {quote && (
+              <Card style={styles.mb_10}>
+                <Text style={[styles.h3, styles.mb_10]}>Quote of the day</Text>
+                <Text>"{quote.quote}"</Text>
+                <Text>- {quote.author}</Text>
+              </Card>
+            )}
 
             <Card>
               <Text style={[styles.h3, styles.mb_10]}>New Task</Text>
