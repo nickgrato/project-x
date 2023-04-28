@@ -1,7 +1,9 @@
-import { StyleSheet, Text, TextStyle } from 'react-native'
 import React from 'react'
+import { StyleSheet, Text } from 'react-native'
+import colors from '../../constants/colors'
+
 type HeadingMdPropsT = {
-  style?: TextStyle
+  style?: {}
   children: string
 }
 const HeadingMd = ({ children, style }: HeadingMdPropsT) => (
@@ -14,5 +16,6 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 26,
     fontWeight: '700',
+    color: colors.med_black,
   },
 })

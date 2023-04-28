@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { StyleSheet, Text, View, ScrollView } from 'react-native'
+import React, { useState, useCallback } from 'react'
+import { StyleSheet, View } from 'react-native'
 import {
   List,
   ListItem,
@@ -9,8 +9,7 @@ import {
   Icon,
 } from '@ui-kitten/components'
 import { useFocusEffect } from '@react-navigation/native'
-import HeadingMd from '../components/HeadingMd'
-import BodyMd from '../components/BodyMd'
+import { HeadingMd, BodyMd } from '../components/typography'
 
 export default function ListScreen() {
   type TaskT = {
@@ -22,6 +21,7 @@ export default function ListScreen() {
   const [tasks, setTasks] = useState<any[]>([])
   const [task, setTask] = useState<TaskT>({} as TaskT)
   const [visible, setVisible] = useState<boolean>(false)
+  const [showActive, setShowActive] = useState<boolean>(true)
 
   // This hook runs everytime the screen gets routed to
   useFocusEffect(
@@ -119,8 +119,26 @@ export default function ListScreen() {
 
   return (
     <View style={styles.container}>
+      <Button
+        onPress={() => setShowActive((state) => !state)}
+        appearance="outline"
+      >
+        {showActive ? 'View Completed Tasks' : 'View Active Tasks'}
+      </Button>
       {/* List of Tasks  */}
-      {tasks && <List data={tasks} renderItem={renderItem} />}
+      {tasks && showActive && (
+        <List
+          data={tasks.filter((task) => task.is_active === true)}
+          renderItem={renderItem}
+        />
+      )}
+
+      {tasks && !showActive && (
+        <List
+          data={tasks.filter((task) => task.is_active === false)}
+          renderItem={renderItem}
+        />
+      )}
 
       {/* Edit / Delete model  */}
       <Modal

@@ -1,7 +1,8 @@
-import { StyleSheet, Text, TextStyle } from 'react-native'
 import React from 'react'
+import { StyleSheet, Text } from 'react-native'
+import colors from '../../constants/colors'
 type BodyMdPropsT = {
-  style?: TextStyle
+  style?: {}
   children: string
 }
 const BodyMd = ({ children, style }: BodyMdPropsT) => (
@@ -14,5 +15,6 @@ const styles = StyleSheet.create({
   body: {
     fontSize: 16,
     fontWeight: '500',
+    color: colors.med_black,
   },
 })

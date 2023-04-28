@@ -11,6 +11,12 @@ import {
 import { Avatar, Text, Card, Input, Button, Icon } from '@ui-kitten/components'
 import colors from '../constants/colors'
 import Message from '../shared/Message'
+import {
+  HeadingXl,
+  HeadingMd,
+  BodyMd,
+  BodyMdBold,
+} from '../components/typography'
 
 const PlusIcon = (props) => <Icon {...props} name="plus-outline" />
 
@@ -80,7 +86,7 @@ export default function Home() {
     const body = {
       title: title,
       description: description,
-      is_active: true,
+      is_active: false,
     }
 
     const resp = (await fetch('https://serverx.fly.dev/api/tasks', {
@@ -118,23 +124,23 @@ export default function Home() {
           {/* HEADER  */}
           <View style={styles.header}>
             <Avatar size="giant" source={require('../assets/darth.png')} />
-            <Text style={[styles.h1, styles.header, styles.ml_10]}>
-              Welcome home nick,
-            </Text>
+            <HeadingXl style={[styles.header, styles.ml_10]}>
+              Welcome Nick,
+            </HeadingXl>
           </View>
 
           {/* HOME SCREEN CONTENTS  */}
           <ScrollView style={styles.body}>
             {quote && (
               <Card style={styles.mb_10}>
-                <Text style={[styles.h3, styles.mb_10]}>Quote of the day</Text>
-                <Text>"{quote.quote}"</Text>
-                <Text>- {quote.author}</Text>
+                <HeadingMd style={styles.mb_10}>Quote of the day</HeadingMd>
+                <BodyMd style={styles.mb_10}>{`"${quote.quote}"`}</BodyMd>
+                <BodyMdBold>{`- ${quote.author}"`}</BodyMdBold>
               </Card>
             )}
 
             <Card>
-              <Text style={[styles.h3, styles.mb_10]}>New Task</Text>
+              <HeadingMd style={styles.mb_10}>New Task</HeadingMd>
 
               {isError && (
                 <Message
