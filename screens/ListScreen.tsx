@@ -10,32 +10,31 @@ import {
 } from '@ui-kitten/components'
 import { useFocusEffect } from '@react-navigation/native'
 import { HeadingMd, BodyMd } from '../components/typography'
+import {
+  getTasks,
+  TaskT,
+  deleteTask,
+  updateTask,
+} from '../services/task.service'
+// https://akveo.github.io/eva-icons/#/
 
 export default function ListScreen() {
-  type TaskT = {
-    title: string
-    description: string
-    id: string
-    is_active: boolean
-  }
   const [tasks, setTasks] = useState<any[]>([])
   const [task, setTask] = useState<TaskT>({} as TaskT)
   const [visible, setVisible] = useState<boolean>(false)
   const [showActive, setShowActive] = useState<boolean>(true)
-
+  console.log('tasks')
   // This hook runs everytime the screen gets routed to
   useFocusEffect(
     useCallback(() => {
-      getTasks()
+      const getData = async () => {
+        const tasks = await getTasks()
+        console.log('tasks', tasks)
+        setTasks(tasks)
+      }
+      getData()
     }, [])
   )
-
-  const getTasks = async () => {
-    const blob = await fetch('https://serverx.fly.dev/api/tasks')
-    const { data } = await blob.json()
-    console.log(data)
-    setTasks(data)
-  }
 
   // Click Events
   const dispatchModal = (task: TaskT) => {
@@ -63,22 +62,34 @@ export default function ListScreen() {
     return formattedTest
   }
 
-  // CRUD
-  const deleteTask = async (task: TaskT) => {
-    const resp = (await fetch(`https://serverx.fly.dev/api/tasks/${task.id}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).catch((error) => {
-      // setIsFailure(true)
-    })) as Response
-    closeModal()
-    getTasks()
+  const deleteTaskPress = async () => {
+    try {
+      await deleteTask(task.id)
+      closeModal()
+
+      // Refresh tasks
+      const tasks = await getTasks()
+      setTasks(tasks)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
-  const deleteTaskPress = () => {
-    deleteTask(task)
+  const deactivateTaskPress = async () => {
+    try {
+      await updateTask({
+        ...task,
+
+        is_active: false,
+      })
+      closeModal()
+
+      // Refresh tasks
+      const tasks = await getTasks()
+      setTasks(tasks)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   /**
@@ -102,18 +113,25 @@ export default function ListScreen() {
     <View style={styles.footerContainer}>
       <Button
         style={styles.footerControl}
+        onPress={() => deactivateTaskPress()}
+        status="primary"
+        appearance="outline"
+        accessoryLeft={<Icon name="checkmark-circle-2-outline" />}
+      />
+      <Button
+        style={styles.footerControl}
         onPress={() => deleteTaskPress()}
         status="danger"
         appearance="outline"
         accessoryLeft={<Icon name="trash" />}
       />
-      <Button
+      {/* <Button
         style={styles.footerControl}
         onPress={() => closeModal()}
         status="success"
         appearance="outline"
         accessoryLeft={<Icon name="checkmark" />}
-      />
+      /> */}
     </View>
   )
 

@@ -8,6 +8,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native'
+import { createTask } from '../services/task.service'
 import { Avatar, Text, Card, Input, Button, Icon } from '@ui-kitten/components'
 import colors from '../constants/colors'
 import Message from '../shared/Message'
@@ -17,6 +18,7 @@ import {
   BodyMd,
   BodyMdBold,
 } from '../components/typography'
+import { utils } from '../styles/util'
 
 const PlusIcon = (props) => <Icon {...props} name="plus-outline" />
 
@@ -83,32 +85,26 @@ export default function Home() {
    * Submit Post Request
    */
   const submitTask = async () => {
-    const body = {
+    const task = {
       title: title,
       description: description,
-      is_active: false,
+      is_active: true,
     }
 
-    const resp = (await fetch('https://serverx.fly.dev/api/tasks', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    }).catch((error) => {
+    try {
+      const resp = await createTask(task)
+      if (resp.status === 201) {
+        clearForm()
+        setIsSuccess(true)
+        setTimeout(() => {
+          setIsSuccess(false)
+        }, 8000)
+      } else {
+        setIsFailure(true)
+      }
+    } catch (error) {
       setIsFailure(true)
-    })) as Response
-
-    console.log('resp', resp)
-
-    if (resp.status === 201) {
-      clearForm()
-      setIsSuccess(true)
-      setTimeout(() => {
-        setIsSuccess(false)
-      }, 8000)
-    } else {
-      setIsFailure(true)
+      console.error(error)
     }
   }
 
@@ -124,7 +120,7 @@ export default function Home() {
           {/* HEADER  */}
           <View style={styles.header}>
             <Avatar size="giant" source={require('../assets/darth.png')} />
-            <HeadingXl style={[styles.header, styles.ml_10]}>
+            <HeadingXl style={[styles.header, utils.ml_10]}>
               Welcome Nick,
             </HeadingXl>
           </View>
@@ -132,15 +128,15 @@ export default function Home() {
           {/* HOME SCREEN CONTENTS  */}
           <ScrollView style={styles.body}>
             {quote && (
-              <Card style={styles.mb_10}>
-                <HeadingMd style={styles.mb_10}>Quote of the day</HeadingMd>
-                <BodyMd style={styles.mb_10}>{`"${quote.quote}"`}</BodyMd>
+              <Card style={utils.mb_10}>
+                <HeadingMd style={utils.mb_10}>Quote of the day</HeadingMd>
+                <BodyMd style={utils.mb_10}>{`"${quote.quote}"`}</BodyMd>
                 <BodyMdBold>{`- ${quote.author}"`}</BodyMdBold>
               </Card>
             )}
 
             <Card>
-              <HeadingMd style={styles.mb_10}>New Task</HeadingMd>
+              <HeadingMd style={utils.mb_10}>New Task</HeadingMd>
 
               {isError && (
                 <Message
@@ -169,13 +165,13 @@ export default function Home() {
               <Input
                 size="large"
                 placeholder="Title"
-                style={styles.mb_10}
+                style={utils.mb_10}
                 value={title}
                 onChangeText={(text) => setTitle(text)}
               />
 
               <Input
-                style={styles.mb_10}
+                style={utils.mb_10}
                 multiline={true}
                 textStyle={{ minHeight: 64 }}
                 placeholder="Description"
@@ -184,7 +180,7 @@ export default function Home() {
               />
 
               <Button accessoryLeft={PlusIcon} onPress={handleSubmit}>
-                Submit
+                Add Task
               </Button>
             </Card>
           </ScrollView>
@@ -217,14 +213,5 @@ const styles = StyleSheet.create({
   },
   body: {
     padding: 10,
-  },
-  mr_10: {
-    marginRight: 10,
-  },
-  ml_10: {
-    marginLeft: 10,
-  },
-  mb_10: {
-    marginBottom: 10,
   },
 })
